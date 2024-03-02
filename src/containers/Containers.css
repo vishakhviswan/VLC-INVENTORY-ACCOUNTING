@@ -17,4 +17,28 @@
 }
 /* *********** //DashBoard ******************************* */
 
+/* *********** //Inventory voucher ******************************* */
+.headingLine, .headingLineTwo{
+  border: 1px solid rgb(109, 108, 108);
+  background-color: rgb(109, 108, 108);
+  width: 100%;
 
+}
+.smallDisply{
+display: none;
+}
+.footerDiv{
+margin-top: 2rem;
+}
+@media only screen and (max-width: 768px) {
+  /* For mobile phones: */
+ .headingLineTwo{
+   display: none;
+ }
+ .largeDisplay{
+   display: none;
+ }
+ .smallDisply{
+   display: block;
+ }
+}

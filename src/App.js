@@ -19,6 +19,7 @@ import { doc, getDoc } from "firebase/firestore";
 
 import { AlterContext } from "./store/SideMenuContext";
 import ChartofAccountsPage from "./Pages/ChartofAccountsPage";
+import InvVoucherPage from "./Pages/inventory/InvVoucherPage";
 
 function App() {
   //const navigate = useNavigate();
@@ -60,6 +61,7 @@ function App() {
             <Route path="/inventory" element={<InventoryPage />} />{" "}
             {/* start work 25-01-2022 12:44 AM, */}
             <Route path="/inventorychart" element={<ChartofAccountsPage />} />
+            <Route path="/invoucher" element={<InvVoucherPage/>} />
             <Route path="/signin" element={<SignIn />} />
             <Route path="/processing" element={<ProcessingPage />} />
             <Route path="/addusers" element={<AddUsersPage />} />

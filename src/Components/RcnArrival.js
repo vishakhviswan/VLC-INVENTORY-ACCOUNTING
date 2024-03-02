@@ -55,7 +55,6 @@ function RcnArrival() {
       e.stopPropagation();
     }
     setValidated(true);
-    console.log("valid", form.checkValidity());
     if (form.checkValidity() === true) {
       const RcnArrivalRef = collection(db, "RcnArrivels");
       setDoc(doc(RcnArrivalRef), {

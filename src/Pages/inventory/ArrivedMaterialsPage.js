@@ -1,7 +1,6 @@
 import React from 'react'
 import  NavbarHeader  from '../../Components/Navbar'
 import { Col, Container, Row } from 'react-bootstrap'
-import InventorySideMenu from '../../containers/inventory/InventorySideMenu'
 import ArrivedMaterials from '../../containers/inventory/ArrivedMaterials'
 import ArrivalsTopBar from '../../containers/inventory/ArrivalsTopBar';
 

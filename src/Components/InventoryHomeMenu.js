@@ -17,7 +17,7 @@ function InventoryHomeMenu() {
         <Card
           bg="light"
           text="dark"
-          style={{ width: "18rem", height: "30rem" }}
+          style={{ width: "18rem", height: "max-content" }}
           className="mb-2"
         >
           <Card.Header style={{ textAlign: "center" }}>Go to</Card.Header>
@@ -51,7 +51,7 @@ function InventoryHomeMenu() {
               List of Stock Items
             </Card.Text>
             <Card.Text className="text-Title">Transactions</Card.Text>
-            <Card.Text
+            {/* <Card.Text
               className="text-items"
               onClick={() => {
                 navigate("/arrivedmaterials");
@@ -59,12 +59,33 @@ function InventoryHomeMenu() {
             >
               Arrivals
             </Card.Text>
+            <Card.Text className="text-items">Despatch</Card.Text> */}
+
             <Card.Text
               className="text-items"
-              
             >
-              Despatch
+              Materials In
             </Card.Text>
+
+            <Card.Text
+              className="text-items"
+             
+            >
+              Materials Out
+            </Card.Text>
+
+            <Card.Text
+              className="text-items"
+            >
+              Delivery Note
+            </Card.Text>
+
+            <Card.Text
+              className="text-items"
+            >
+              Receipt Note
+            </Card.Text>
+
             <Card.Text className="text-items" onClick={handleAlert}>
               Processing
             </Card.Text>

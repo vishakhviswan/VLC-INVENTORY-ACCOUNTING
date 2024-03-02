@@ -1,38 +1,122 @@
+import { collection, doc, setDoc } from "firebase/firestore";
 import React, { useState } from "react";
-import { Button, Col, Container, Form, Row } from "react-bootstrap";
+import { useContext } from "react";
+import { Button, Col, Container, Form, Modal, Row, Table } from "react-bootstrap";
+import { TopBarContext } from "../store/ArrivalsContext";
+import { AuthContext, FirebaseContext } from "../store/Context";
 
 function CkArrival() {
     const [bags, setBags] = useState("");
-    const [value, setValue] = useState('')
-    const [currentValue, setCurrentValue] = useState("");
+    const [value, setValue] = useState(0.00)
+  const [currentValue, setCurrentValue] = useState(0);
+  const [wholes, setWholes] = useState();
+  
     const FindPound = (value) => {
-        setCurrentValue(value);
-        const Pound = (value * 2.2) / bags;
+        const Pound = (value * 2.2 )/ bags;
         setValue( parseFloat(Pound).toFixed(2)) 
     }
     
   
-  const [wholes, setWholes] = useState("");
 //   const wholesPound = (wholes * 2.2) / bags;
 //   const wholesWithTwoDecimalPlaces = parseFloat(wholesPound).toFixed(2); 
 
-    const [pieces, setPieces] = useState("");
-  const [pwl, setPwl] = useState("");
-  const [rej, setRej] = useState("");
+    const [pieces, setPieces] = useState();
+  const [pwl, setPwl] = useState();
+  const [rej, setRej] = useState();
   const [impOrLoc, setImpOrLoc] = useState("");
   const [origin, setOrigin] = useState("");
+  const { recived, date, lot, validated, setValidated,recivedFrom } =
+    useContext(TopBarContext);
+  const {db} = useContext(FirebaseContext)
+  const {userDetails} = useContext(AuthContext)
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    if (form.checkValidity() === false) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setValidated(true);
 
+    if (form.checkValidity() === true) { 
+      const StockItemRef = collection(db, "Stock Items");
+       setDoc(doc(StockItemRef), {
+         //,general
+         arrivedFrom: recivedFrom,
+         factory: userDetails.company,
+         itemName: recived,
+         Grades: [
+           {
+             grade: "Wholes",
+             quantity: wholes,
+             poundPerBag: parseFloat((wholes * 2.2) / bags).toFixed(2),
+           },
+           {
+             grade: "Pieces",
+             quantity: pieces,
+             quantity: wholes,
+             poundPerBag: parseFloat((pieces * 2.2) / bags).toFixed(2),
+           },
+           {
+             grade: "Pwl",
+             quantity: pwl,
+             quantity: wholes,
+             poundPerBag: parseFloat((pwl * 2.2) / bags).toFixed(2),
+           },
+           {
+             grade: "Rej",
+             quantity: rej,
+             quantity: wholes,
+             poundPerBag: parseFloat((rej * 2.2) / bags).toFixed(2),
+           },
+         ],
+         lot: lot,
+         importOrLocal: impOrLoc,
+         origin: origin,
+         cuttingBags: bags,
+       }).catch((e) => {
+         console.log(e);
+         alert("error", e);
+       })
+    }
+
+  }
+
+  const [preview, setPreview] = useState([])
+  const [show,setShow]= useState(false)
+  const handlePreview = () => {
+    setPreview([
+      {
+        title: "Recived Item",
+        name: recived,
+      },
+      { title: "Recived From", name: recivedFrom },
+      { title: "Lot #", name: lot },
+      { title: "Date", name: date },
+      { title: "Import/Local", name: impOrLoc },
+      { title: "Origin", name: origin },
+      { title: "Bags", name: bags },
+      { title: "Wholes", name: wholes },
+      { title: "Pieces", name: pieces },
+      { title: "Total", name: wholes + pieces },
+      { title: "Pwl", name: pwl },
+      { title: "Rej", name: rej },
+      { title: "Total", name: wholes + pieces + pwl +rej },
+    ]);
+    setShow(true)
+  }
+console.log(preview);
   return (
     <div>
       <div className="ck_ChildDiv">
         <Container className="rcnFormContainer">
-          <Form
-          // noValidate validated={validated} onSubmit={handleSubmit}
-          >
+          <Form noValidate validated={validated} onSubmit={handleSubmit}>
             <Row>
               <Col>
                 <Form.Check
                   // value={impOrLoc}
+                  required
                   value="local"
                   onChange={(e) => {
                     setImpOrLoc(e.target.value);
@@ -43,6 +127,7 @@ function CkArrival() {
                   label="Local"
                 />
                 <Form.Check
+                  required
                   // value={impOrLoc}
                   onChange={(e) => {
                     setImpOrLoc(e.target.value);
@@ -58,6 +143,7 @@ function CkArrival() {
                 <Form.Group as={Col} controlId="formGridPlace">
                   <Form.Label>Orgin</Form.Label>
                   <Form.Control
+                    required
                     value={origin}
                     onChange={(e) => {
                       setOrigin(e.target.value);
@@ -72,9 +158,10 @@ function CkArrival() {
                 <Form.Group as={Col} controlId="formGridPlace">
                   <Form.Label>Bags</Form.Label>
                   <Form.Control
+                    required
                     value={bags}
                     onChange={(e) => {
-                      setBags(e.target.value);
+                      setBags(parseInt(e.target.value));
                     }}
                     type="place"
                     placeholder="bags"
@@ -87,21 +174,24 @@ function CkArrival() {
                 <Form.Label>Wholes</Form.Label>
                 <Form.Control
                   required
-                  value={wholes}
                   onChange={(e) => {
-                    setWholes(e.target.value);
-                    FindPound(e.target.value);
+                    setWholes(parseFloat(e.target.value));
                   }}
                   type="place"
-                  placeholder="Enter Arrived Place / Factory"
+                  placeholder="Wholes in kgs"
                 />
               </Form.Group>
 
               <Form.Group as={Col} controlId="formGridInvoice">
-                <Form.Label>-</Form.Label>
+                <Form.Label>Pound per bag</Form.Label>
                 <Form.Control
+                  disabled
                   type="text"
-                  placeholder={wholes == currentValue ? value : "wait"}
+                  placeholder={
+                    bags
+                      ? parseFloat((wholes * 2.2) / bags).toFixed(2)
+                      : "Enter Number Of bags for show pound!"
+                  }
                 />
               </Form.Group>
             </Row>
@@ -111,21 +201,24 @@ function CkArrival() {
                 <Form.Label>Pieces</Form.Label>
                 <Form.Control
                   required
-                  value={pieces}
                   onChange={(e) => {
-                    setPieces(e.target.value);
-                    FindPound(e.target.value);
+                    setPieces(parseFloat(e.target.value));
                   }}
                   type="place"
-                  placeholder="Enter Arrived Place / Factory"
+                  placeholder="pieces in Kgs"
                 />
               </Form.Group>
 
               <Form.Group as={Col} controlId="formGridInvoice">
-                <Form.Label>-</Form.Label>
+                <Form.Label>Pound per bag</Form.Label>
                 <Form.Control
+                  disabled
                   type="text"
-                  placeholder={pieces == currentValue ? value : "wait"}
+                  placeholder={
+                    bags
+                      ? parseFloat((pieces * 2.2) / bags).toFixed(2)
+                      : "Enter Number Of bags for show pound!"
+                  }
                 />
               </Form.Group>
             </Row>
@@ -135,11 +228,10 @@ function CkArrival() {
                 <Form.Label>Pwl</Form.Label>
                 <Form.Control
                   required
-                  value={pwl}
                   onChange={(e) => {
-                    setPwl(e.target.value);
+                    setPwl(parseFloat(e.target.value));
                   }}
-                  placeholder="ex:count, outurn, rej"
+                  placeholder="Pwl in Kgs"
                 />
               </Form.Group>
 
@@ -148,8 +240,15 @@ function CkArrival() {
                 className="mb-3"
                 controlId="formGridAddress2"
               >
-                <Form.Label>-</Form.Label>
-                <Form.Control placeholder="Ex : AP-00-AA-0000" />
+                <Form.Label>Pound per bag</Form.Label>
+                <Form.Control
+                  disabled
+                  placeholder={
+                    bags
+                      ? parseFloat((pwl * 2.2) / bags).toFixed(2)
+                      : "Enter Number Of bags for show pound!"
+                  }
+                />
               </Form.Group>
             </Row>
 
@@ -158,11 +257,10 @@ function CkArrival() {
                 <Form.Label>Rej</Form.Label>
                 <Form.Control
                   required
-                  value={rej}
                   onChange={(e) => {
-                    setRej(e.target.value);
+                    setRej(parseFloat(e.target.value));
                   }}
-                  placeholder="ex:count, outurn, rej"
+                  placeholder="Rejection in Kgs"
                 />
               </Form.Group>
 
@@ -171,8 +269,15 @@ function CkArrival() {
                 className="mb-3"
                 controlId="formGridAddress2"
               >
-                <Form.Label>-</Form.Label>
-                <Form.Control placeholder="Ex : AP-00-AA-0000" />
+                <Form.Label>Pound per bag</Form.Label>
+                <Form.Control
+                  disabled
+                  placeholder={
+                    bags
+                      ? parseFloat((rej * 2.2) / bags).toFixed(2)
+                      : "Enter Number Of bags for show pound!"
+                  }
+                />
               </Form.Group>
             </Row>
 
@@ -180,10 +285,7 @@ function CkArrival() {
               <Form.Check type="checkbox" label="Check me out" />
             </Form.Group>
             <Form.Group className="d-flex justify-content-center">
-              <Button
-                variant="warning"
-                // onClick={() => setShow(true)}
-              >
+              <Button variant="warning" onClick={handlePreview}>
                 Preview
               </Button>
               <Button variant="primary" type="submit">
@@ -194,34 +296,30 @@ function CkArrival() {
         </Container>
         {/* ***************************modal***************************************** */}
 
-        {/* <Modal
-            show={show}
-            onHide={() => setShow(false)}
-            dialogClassName="modal-90w"
-            aria-labelledby="example-custom-modal-styling-title"
-          >
-            <Modal.Header closeButton>
-              <Modal.Title id="example-custom-modal-styling-title">
-                Please Check Your Details are Correct
-              </Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>
-                date: {date},<br />
-                lotNo: {lot},<br />
-                recivedGrade: {recived},<br />
-                importOrLocal:{impOrLoc},<br />
-                rcnMark: {mark},<br />
-                arrivedFrom: {arrived},<br />
-                invoiceNo: {invoice},<br />
-                outurn: {outurn},<br />
-                vehicleNo:{vehicle},<br />
-                bags: {bags},<br />
-                weight: {weight},<br />
-                remarks: {remarks},
-              </p>
-            </Modal.Body>
-          </Modal> */}
+        <Modal
+          show={show}
+          onHide={() => setShow(false)}
+          dialogClassName="modal-90w"
+          aria-labelledby="example-custom-modal-styling-title"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title id="example-custom-modal-styling-title">
+              Please Check Your Details are Correct
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            <Table striped bordered hover>
+              <tbody>
+                {preview.map((obj) => (
+                  <tr>
+                    <th>{obj.title}</th>
+                    <td>{obj.name}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </Modal.Body>
+        </Modal>
       </div>
     </div>
   );

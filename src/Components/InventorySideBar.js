@@ -21,6 +21,7 @@ function InventorySideBar() {
             <Offcanvas.Title>Offcanvas</Offcanvas.Title>
           </Offcanvas.Header>
           <Offcanvas.Body>
+            
             Some text as placeholder. In real life you can have the elements you
             have chosen. Like, text, images, lists, etc.
           </Offcanvas.Body>
@@ -32,7 +33,7 @@ function InventorySideBar() {
   return (
     <div className="inventorySideBar_Pd">
       <div className="inventorySideBar_Cd">
-        <OffCanvasExample placement="end" name="Side Bar" />
+        <OffCanvasExample placement="end" name="Vouchers" />
       </div>
     </div>
   );
